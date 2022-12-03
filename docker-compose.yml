@@ -39,6 +39,12 @@ networks:
 secrets:
   htpasswd:
     file: $DOCKERDIR/secrets/htpasswd
+  cf_email:
+    file: $DOCKERDIR/secrets/cf_email
+  cf_api_key:
+    file: $DOCKERDIR/secrets/cf_api_key
+  cf_token:
+    file: $DOCKERDIR/secrets/cf_token
   traefik_forward_auth:
     file: $DOCKERDIR/secrets/traefik_forward_auth
   mysql_root_password:
@@ -198,7 +204,10 @@ services:
       - $DOCKERDIR/appdata/traefik2/acme/acme.json:/acme.json # cert location - you must create this emtpy file and change permissions to 600
       - $DOCKERDIR/logs/cloudserver/traefik:/logs # for fail2ban or crowdsec
     environment:
-      - TZ : $TZ
+      - TZ=$TZ
+      - CF_API_EMAIL_FILE=/run/secrets/cf_email
+      - CF_API_KEY_FILE=/run/secrets/cf_api_key
+      - HTPASSWD_FILE=/run/secrets/htpasswd # HTPASSWD_FILE can be whatever as it is not used/called anywhere.
       - DOMAINNAME_CLOUD_SERVER # Passing the domain name to traefik container to be able to use the variable in rules. 
     secrets:
       - cf_email
@@ -844,25 +853,25 @@ services:
       TZ: $TZ
       DOCKER_HOST: tcp://socket-proxy:2375
 
-  # Cloudflare-Companion - Automatic CNAME DNS Creation
-  cf-companion:
-    <<: *common-keys-core # See EXTENSION FIELDS at the top
-    container_name: cf-companion
-    image: tiredofit/traefik-cloudflare-companion:latest
-    networks:
-      - socket_proxy
-    environment:
-      - TIMEZONE=$TZ
-      - TRAEFIK_VERSION=2
-      - CF_TOKEN__FILE=/run/secrets/cf_token
-      - TARGET_DOMAIN=cdoc.$DOMAINNAME_CLOUD_SERVER # Edit this. Either a subdomain or just $DOMAINNAME_CLOUD_SERVER pointing to the IP will work. See: https://github.com/htpcBeginner/docker-traefik/issues/244.
-      - DOMAIN1=$DOMAINNAME_CLOUD_SERVER
-      - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
-      - DOMAIN1_PROXIED=TRUE
-      - DOCKER_HOST=tcp://socket-proxy:2375
-    secrets: 
-      - cf_token
-    labels:
-      # Add hosts specified in rules here to force cf-companion to create the CNAMEs
-      # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
-      - "traefik.http.routers.cf-companion-rtr.rule=Host(Host(`webmin.$DOMAINNAME_CLOUD_SERVER`) || Host(`shell.$DOMAINNAME_CLOUD_SERVER`) || Host(`stcdoc.$DOMAINNAME_CLOUD_SERVER`) || Host(`ag.$DOMAINNAME_CLOUD_SERVER`)"
+  # # Cloudflare-Companion - Automatic CNAME DNS Creation
+  # cf-companion:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   container_name: cf-companion
+  #   image: tiredofit/traefik-cloudflare-companion:latest
+  #   networks:
+  #     - socket_proxy
+  #   environment:
+  #     - TIMEZONE=$TZ
+  #     - TRAEFIK_VERSION=2
+  #     - CF_TOKEN__FILE=/run/secrets/cf_token
+  #     - TARGET_DOMAIN=cdoc.$DOMAINNAME_CLOUD_SERVER # Edit this. Either a subdomain or just $DOMAINNAME_CLOUD_SERVER pointing to the IP will work. See: https://github.com/htpcBeginner/docker-traefik/issues/244.
+  #     - DOMAIN1=$DOMAINNAME_CLOUD_SERVER
+  #     - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
+  #     - DOMAIN1_PROXIED=TRUE
+  #     - DOCKER_HOST=tcp://socket-proxy:2375
+  #   secrets: 
+  #     - cf_token
+  #   labels:
+  #     # Add hosts specified in rules here to force cf-companion to create the CNAMEs
+  #     # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
+  #     - "traefik.http.routers.cf-companion-rtr.rule=Host(Host(`webmin.$DOMAINNAME_CLOUD_SERVER`) || Host(`shell.$DOMAINNAME_CLOUD_SERVER`) || Host(`stcdoc.$DOMAINNAME_CLOUD_SERVER`) || Host(`ag.$DOMAINNAME_CLOUD_SERVER`)"
