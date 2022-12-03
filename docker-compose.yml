@@ -39,12 +39,6 @@ networks:
 secrets:
   htpasswd:
     file: $DOCKERDIR/secrets/htpasswd
-  cf_email:
-    file: $DOCKERDIR/secrets/cf_email
-  cf_api_key:
-    file: $DOCKERDIR/secrets/cf_api_key
-  cf_token:
-    file: $DOCKERDIR/secrets/cf_token
   traefik_forward_auth:
     file: $DOCKERDIR/secrets/traefik_forward_auth
   mysql_root_password:
@@ -204,10 +198,7 @@ services:
       - $DOCKERDIR/appdata/traefik2/acme/acme.json:/acme.json # cert location - you must create this emtpy file and change permissions to 600
       - $DOCKERDIR/logs/cloudserver/traefik:/logs # for fail2ban or crowdsec
     environment:
-      - TZ=$TZ
-      - CF_API_EMAIL_FILE=/run/secrets/cf_email
-      - CF_API_KEY_FILE=/run/secrets/cf_api_key
-      - HTPASSWD_FILE=/run/secrets/htpasswd # HTPASSWD_FILE can be whatever as it is not used/called anywhere.
+      - TZ : $TZ
       - DOMAINNAME_CLOUD_SERVER # Passing the domain name to traefik container to be able to use the variable in rules. 
     secrets:
       - cf_email
@@ -548,7 +539,7 @@ services:
       t2_proxy:
         ipv4_address: 192.168.90.164
     ports:
-      - "$RADARR_PORT:7878"
+      - $RADARR_PORT:7878
     volumes:
       - $DOCKERDIR/appdata/radarr:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
