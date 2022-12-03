@@ -1,5 +1,7 @@
-*
-*/
+.env
+.secrets/
+.gitignore
+
 
 !.gitignore
 !README.md
