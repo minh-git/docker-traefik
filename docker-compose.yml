@@ -688,7 +688,7 @@ services:
       - "32412:32412/udp"
       - "32413:32413/udp"
       - "32414:32414/udp"
-      - "32400:33400"
+      - "33400:33400"
     volumes:
       - $DOCKERDIR/appdata/plexms:/config
       - $DATADIR/downloads:/data/downloads
