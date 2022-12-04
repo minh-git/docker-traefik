@@ -701,7 +701,7 @@ services:
     environment:
       TZ: $TZ
       HOSTNAME: "zPlex"
-      PLEX_CLAIM_FILE: /run/secrets/plex_claim
+      PLEX_CLAIM: $PLEX_CLAIM
       PLEX_UID: $PUID
       PLEX_GID: $PGID
       ADVERTISE_IP: http://$ZEROTIER_IP_CLOUDSERVER:32400/
