@@ -110,7 +110,7 @@ x-common-keys-media: &common-keys-media
     - t2_proxy
   security_opt:
     - no-new-privileges:true
-  restart: "no"
+  restart: unless-stopped
   # profiles:
   # - media
 
