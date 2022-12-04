@@ -342,6 +342,8 @@ services:
       - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
     environment:
       - TZ=$TZ
+    env_file:
+        - .env
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
