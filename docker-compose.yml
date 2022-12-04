@@ -26,7 +26,7 @@ networks:
     ipam:
       config:
         - subnet: 192.168.90.0/24
-    external: true
+    external:
   default:
     driver: bridge
   socket_proxy:
